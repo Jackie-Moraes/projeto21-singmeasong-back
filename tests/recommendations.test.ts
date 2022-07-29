@@ -84,7 +84,7 @@ describe("POST /recommendations/:id/downvote", () => {
 })
 
 describe("GET /recommendations", () => {
-    it("should answer with correct database information", async () => {
+    it("should answer with correct recommendation information", async () => {
         let recommendations = []
         for (let i = 1; i <= 3; i++) {
             recommendations.push(
@@ -103,5 +103,21 @@ describe("GET /recommendations", () => {
     it("should return empty if database has no recommendations", async () => {
         const response = await supertest(app).get(`/recommendations`).send()
         expect(response.body).toStrictEqual([])
+    })
+})
+
+describe("GET /recommendations/:id", () => {
+    it("should answer with recommendation information when given existing id", async () => {
+        const recommendation =
+            await recommendationsFactory.createRandomRecommendation()
+        const response = await supertest(app)
+            .get(`/recommendations/${recommendation.id}`)
+            .send()
+        expect(response.body).toStrictEqual(recommendation)
+    })
+
+    it("should return 404 if id is incorrect", async () => {
+        const response = await supertest(app).get(`/recommendations/0`).send()
+        expect(response.status).toBe(404)
     })
 })

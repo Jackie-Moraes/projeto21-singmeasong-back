@@ -80,4 +80,5 @@ export const recommendationsFactory = {
     checkIfRecommendationExists,
     createRandomRecommendation,
     randomRecommendationTemplate,
+    raiseRecommendationScore,
 }

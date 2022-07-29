@@ -144,3 +144,37 @@ describe("GET /recommendations/random", () => {
         expect(response.status).toBe(404)
     })
 })
+
+describe("GET /recommendations/top/:amount", () => {
+    it("should answer with the top three recommendations in order", async () => {
+        let number = 5
+        const recommendations = []
+        for (let i = 0; i <= 4; i++) {
+            recommendations.push(
+                await recommendationsFactory.createRandomRecommendation()
+            )
+            await recommendationsFactory.raiseRecommendationScore(
+                recommendations[i].id,
+                number
+            )
+            recommendations[i].score = number
+            number--
+        }
+
+        const response = await supertest(app)
+            .get(`/recommendations/top/3`)
+            .send()
+        expect(response.body).toStrictEqual([
+            recommendations[0],
+            recommendations[1],
+            recommendations[2],
+        ])
+    })
+
+    it("should answer with an empty array when there are no recommendations", async () => {
+        const response = await supertest(app)
+            .get(`/recommendations/top/3`)
+            .send()
+        expect(response.body).toStrictEqual([])
+    })
+})

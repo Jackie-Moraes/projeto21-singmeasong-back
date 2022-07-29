@@ -20,4 +20,25 @@ async function createRecommendation() {
     return recommendation.id
 }
 
-export const recommendationsFactory = { musicTemplate, createRecommendation }
+async function setScoreForDeletion(id: number) {
+    return await prisma.recommendation.update({
+        where: { id },
+        data: {
+            score: -5,
+        },
+    })
+}
+
+async function checkIfRecommendationExists(id: number) {
+    const exists = await prisma.recommendation.findUnique({
+        where: { id },
+    })
+    return exists
+}
+
+export const recommendationsFactory = {
+    musicTemplate,
+    createRecommendation,
+    setScoreForDeletion,
+    checkIfRecommendationExists,
+}

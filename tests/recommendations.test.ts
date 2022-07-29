@@ -8,9 +8,9 @@ beforeEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE recommendations`
 })
 
-describe("POST /something", () => {
-    it("should answer something when something happens", async () => {})
-})
+// describe("POST /something", () => {
+//     it("should answer something when something happens", async () => {})
+// })
 
 describe("POST /recommendations", () => {
     it("should answer 201 when valid information is sent", async () => {
@@ -51,5 +51,32 @@ describe("POST /recomendations/:id/upvote", () => {
             .post(`/recommendations/0/upvote`)
             .send()
         expect(response.status).toBe(404)
+    })
+})
+
+describe("POST /recomendations/:id/downvote", () => {
+    it("should answer 200 when posting to existing id", async () => {
+        const id = await recommendationsFactory.createRecommendation()
+        const response = await supertest(app)
+            .post(`/recommendations/${id}/downvote`)
+            .send()
+        expect(response.status).toBe(200)
+    })
+
+    it("should answer 404 when posting to inexistent id", async () => {
+        const response = await supertest(app)
+            .post(`/recommendations/0/downvote`)
+            .send()
+        expect(response.status).toBe(404)
+    })
+
+    it("should delete recommendation when score is under five and return null", async () => {
+        const id = await recommendationsFactory.createRecommendation()
+        await recommendationsFactory.setScoreForDeletion(id)
+        await supertest(app).post(`/recommendations/${id}/downvote`).send()
+        const exists = await recommendationsFactory.checkIfRecommendationExists(
+            id
+        )
+        expect(exists).toBe(null)
     })
 })

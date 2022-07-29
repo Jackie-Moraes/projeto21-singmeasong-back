@@ -1,3 +1,5 @@
+import { faker } from "@faker-js/faker"
+
 import { prisma } from "../../src/database.js"
 
 const musicTemplate = () => {
@@ -36,9 +38,24 @@ async function checkIfRecommendationExists(id: number) {
     return exists
 }
 
+async function createRandomRecommendation() {
+    const info = {
+        name: faker.name.findName(),
+        youtubeLink: faker.internet.url.toString(),
+    }
+    const recommendation = await prisma.recommendation.create({
+        data: {
+            name: info.name,
+            youtubeLink: info.youtubeLink,
+        },
+    })
+    return recommendation
+}
+
 export const recommendationsFactory = {
     musicTemplate,
     createFixedRecommendation,
     setScoreForDeletion,
     checkIfRecommendationExists,
+    createRandomRecommendation,
 }

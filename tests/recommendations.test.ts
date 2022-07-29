@@ -1,8 +1,10 @@
 import supertest from "supertest"
+import faker from "@faker-js/faker"
 
 import { prisma } from "../src/database.js"
 import app from "../src/app.js"
 import { recommendationsFactory } from "./factories/recommendationsFactory.js"
+import { Recommendation } from "@prisma/client"
 
 beforeEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE recommendations`
@@ -82,8 +84,24 @@ describe("POST /recommendations/:id/downvote", () => {
 })
 
 describe("GET /recommendations", () => {
-    it("should answer 200 when sent", async () => {
+    it("should answer with correct database information", async () => {
+        let recommendations = []
+        for (let i = 1; i <= 3; i++) {
+            recommendations.push(
+                await recommendationsFactory.createRandomRecommendation()
+            )
+        }
+
         const response = await supertest(app).get(`/recommendations`).send()
-        expect(response.status).toBe(200)
+        expect(response.body).toStrictEqual([
+            recommendations[2],
+            recommendations[1],
+            recommendations[0],
+        ])
+    })
+
+    it("should return empty if database has no recommendations", async () => {
+        const response = await supertest(app).get(`/recommendations`).send()
+        expect(response.body).toStrictEqual([])
     })
 })

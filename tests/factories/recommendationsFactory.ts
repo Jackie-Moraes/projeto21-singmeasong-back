@@ -11,6 +11,17 @@ const musicTemplate = () => {
     return body
 }
 
+const randomRecommendationTemplate = () => {
+    const body = {
+        id: expect.any(Number),
+        name: expect.any(String),
+        youtubeLink: expect.any(String),
+        score: expect.any(Number),
+    }
+
+    return body
+}
+
 async function createFixedRecommendation() {
     const info = musicTemplate()
     const recommendation = await prisma.recommendation.create({
@@ -41,8 +52,9 @@ async function checkIfRecommendationExists(id: number) {
 async function createRandomRecommendation() {
     const info = {
         name: faker.name.findName(),
-        youtubeLink: faker.internet.url.toString(),
+        youtubeLink: faker.internet.url(),
     }
+
     const recommendation = await prisma.recommendation.create({
         data: {
             name: info.name,
@@ -52,10 +64,20 @@ async function createRandomRecommendation() {
     return recommendation
 }
 
+async function raiseRecommendationScore(id: number, value: number) {
+    await prisma.recommendation.update({
+        data: {
+            score: value,
+        },
+        where: { id: id },
+    })
+}
+
 export const recommendationsFactory = {
     musicTemplate,
     createFixedRecommendation,
     setScoreForDeletion,
     checkIfRecommendationExists,
     createRandomRecommendation,
+    randomRecommendationTemplate,
 }

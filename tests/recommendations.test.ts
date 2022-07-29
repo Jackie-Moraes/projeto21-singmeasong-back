@@ -85,7 +85,7 @@ describe("POST /recommendations/:id/downvote", () => {
 
 describe("GET /recommendations", () => {
     it("should answer with correct recommendation information", async () => {
-        let recommendations = []
+        const recommendations = []
         for (let i = 1; i <= 3; i++) {
             recommendations.push(
                 await recommendationsFactory.createRandomRecommendation()
@@ -118,6 +118,29 @@ describe("GET /recommendations/:id", () => {
 
     it("should return 404 if id is incorrect", async () => {
         const response = await supertest(app).get(`/recommendations/0`).send()
+        expect(response.status).toBe(404)
+    })
+})
+
+describe("GET /recommendations/random", () => {
+    it("should answer with random existing recommendation", async () => {
+        for (let i = 1; i <= 2; i++) {
+            await recommendationsFactory.createRandomRecommendation()
+        }
+
+        const recommendation =
+            recommendationsFactory.randomRecommendationTemplate()
+
+        const response = await supertest(app)
+            .get(`/recommendations/random`)
+            .send()
+        expect(response.body).toStrictEqual(recommendation)
+    })
+
+    it("should answer with 404 when no recommendations exist", async () => {
+        const response = await supertest(app)
+            .get(`/recommendations/random`)
+            .send()
         expect(response.status).toBe(404)
     })
 })

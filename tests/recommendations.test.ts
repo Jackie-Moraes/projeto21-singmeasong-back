@@ -36,3 +36,20 @@ describe("POST /recommendations", () => {
         expect(response.status).toBe(409)
     })
 })
+
+describe("POST /recomendations/:id/upvote", () => {
+    it("should answer 200 when posting to existing id", async () => {
+        const id = await recommendationsFactory.createRecommendation()
+        const response = await supertest(app)
+            .post(`/recommendations/${id}/upvote`)
+            .send()
+        expect(response.status).toBe(200)
+    })
+
+    it("should answer 404 when posting to inexistent id", async () => {
+        const response = await supertest(app)
+            .post(`/recommendations/0/upvote`)
+            .send()
+        expect(response.status).toBe(404)
+    })
+})

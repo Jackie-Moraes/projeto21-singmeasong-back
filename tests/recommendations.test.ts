@@ -27,7 +27,7 @@ describe("POST /recommendations", () => {
     })
 
     it("should answer 409 when sending information with duplicated name", async () => {
-        await recommendationsFactory.createRecommendation()
+        await recommendationsFactory.createFixedRecommendation()
 
         const body = recommendationsFactory.musicTemplate()
         const response = await supertest(app)
@@ -37,9 +37,9 @@ describe("POST /recommendations", () => {
     })
 })
 
-describe("POST /recomendations/:id/upvote", () => {
+describe("POST /recommendations/:id/upvote", () => {
     it("should answer 200 when posting to existing id", async () => {
-        const id = await recommendationsFactory.createRecommendation()
+        const id = await recommendationsFactory.createFixedRecommendation()
         const response = await supertest(app)
             .post(`/recommendations/${id}/upvote`)
             .send()
@@ -54,9 +54,9 @@ describe("POST /recomendations/:id/upvote", () => {
     })
 })
 
-describe("POST /recomendations/:id/downvote", () => {
+describe("POST /recommendations/:id/downvote", () => {
     it("should answer 200 when posting to existing id", async () => {
-        const id = await recommendationsFactory.createRecommendation()
+        const id = await recommendationsFactory.createFixedRecommendation()
         const response = await supertest(app)
             .post(`/recommendations/${id}/downvote`)
             .send()
@@ -71,12 +71,19 @@ describe("POST /recomendations/:id/downvote", () => {
     })
 
     it("should delete recommendation when score is under five and return null", async () => {
-        const id = await recommendationsFactory.createRecommendation()
+        const id = await recommendationsFactory.createFixedRecommendation()
         await recommendationsFactory.setScoreForDeletion(id)
         await supertest(app).post(`/recommendations/${id}/downvote`).send()
         const exists = await recommendationsFactory.checkIfRecommendationExists(
             id
         )
         expect(exists).toBe(null)
+    })
+})
+
+describe("GET /recommendations", () => {
+    it("should answer 200 when sent", async () => {
+        const response = await supertest(app).get(`/recommendations`).send()
+        expect(response.status).toBe(200)
     })
 })

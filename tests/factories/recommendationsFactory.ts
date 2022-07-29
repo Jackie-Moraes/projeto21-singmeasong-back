@@ -9,7 +9,7 @@ const musicTemplate = () => {
     return body
 }
 
-async function createRecommendation() {
+async function createFixedRecommendation() {
     const info = musicTemplate()
     const recommendation = await prisma.recommendation.create({
         data: {
@@ -38,7 +38,7 @@ async function checkIfRecommendationExists(id: number) {
 
 export const recommendationsFactory = {
     musicTemplate,
-    createRecommendation,
+    createFixedRecommendation,
     setScoreForDeletion,
     checkIfRecommendationExists,
 }

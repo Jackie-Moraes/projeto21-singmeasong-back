@@ -76,3 +76,65 @@ describe("upvote", () => {
         })
     })
 })
+
+describe("downvote", () => {
+    it("should decrease recommendation score when given valid id", async () => {
+        jest.spyOn(recommendationRepository, "find").mockImplementationOnce(
+            (): any => {
+                return true
+            }
+        )
+
+        jest.spyOn(
+            recommendationRepository,
+            "updateScore"
+        ).mockImplementationOnce((): any => {
+            return {}
+        })
+
+        const result = await recommendationService.downvote(1)
+        expect(result).toBeUndefined()
+    })
+
+    it("should delete recommendation if score falls below 5", async () => {
+        const recommendation = servicesFactory.recommendationTemplate()
+
+        jest.spyOn(recommendationRepository, "find").mockImplementationOnce(
+            (): any => {
+                return true
+            }
+        )
+
+        jest.spyOn(
+            recommendationRepository,
+            "updateScore"
+        ).mockImplementationOnce((): any => {
+            return {
+                id: 1,
+                name: recommendation.name,
+                youtubeLink: recommendation.youtubeLink,
+                score: -6,
+            }
+        })
+
+        jest.spyOn(recommendationRepository, "remove").mockImplementationOnce(
+            (): any => {
+                return {}
+            }
+        )
+
+        const result = await recommendationService.downvote(1)
+        expect(result).toBeUndefined()
+    })
+
+    it("should throw error when given id is invalid", async () => {
+        jest.spyOn(recommendationRepository, "find").mockImplementationOnce(
+            (): any => {
+                return false
+            }
+        )
+        await recommendationService.upvote(1).catch((err) => {
+            expect(err.type).toEqual("not_found")
+        })
+    })
+})

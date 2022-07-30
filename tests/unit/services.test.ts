@@ -5,10 +5,6 @@ import { recommendationService } from "../../src/services/recommendationsService
 import { recommendationRepository } from "../../src/repositories/recommendationRepository.js"
 import { servicesFactory } from "../factories/servicesFactory.js"
 
-// describe("POST /something", () => {
-//     it("should answer something when something happens", async () => {})
-// })
-
 beforeEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE recommendations`
 })

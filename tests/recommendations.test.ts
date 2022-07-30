@@ -1,18 +1,12 @@
 import supertest from "supertest"
-import faker from "@faker-js/faker"
 
 import { prisma } from "../src/database.js"
 import app from "../src/app.js"
 import { recommendationsFactory } from "./factories/recommendationsFactory.js"
-import { Recommendation } from "@prisma/client"
 
 beforeEach(async () => {
     await prisma.$executeRaw`TRUNCATE TABLE recommendations`
 })
-
-// describe("POST /something", () => {
-//     it("should answer something when something happens", async () => {})
-// })
 
 describe("POST /recommendations", () => {
     it("should answer 201 when valid information is sent", async () => {

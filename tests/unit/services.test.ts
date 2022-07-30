@@ -215,3 +215,69 @@ describe("getTop", () => {
         expect(result).toStrictEqual([])
     })
 })
+
+describe("getRandom", () => {
+    it("should answer with a recommendation with over 10 score", async () => {
+        const recommendation = servicesFactory.recommendationTemplate()
+
+        jest.spyOn(Math, "random").mockImplementationOnce((): any => {
+            return 0.8
+        })
+
+        jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce(
+            (): any => {
+                return [
+                    {
+                        id: 1,
+                        name: recommendation.name,
+                        youtubeLink: recommendation.youtubeLink,
+                        score: 15,
+                    },
+                ]
+            }
+        )
+
+        const result = await recommendationService.getRandom()
+        expect(result).toStrictEqual({
+            id: 1,
+            name: recommendation.name,
+            youtubeLink: recommendation.youtubeLink,
+            score: 15,
+        })
+    })
+
+    it("should answer with a recommendation with a score under 10", async () => {
+        const recommendation = servicesFactory.recommendationTemplate()
+
+        jest.spyOn(Math, "random").mockImplementationOnce((): any => {
+            return 0.2
+        })
+
+        jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce(
+            (): any => {
+                return [
+                    {
+                        id: 1,
+                        name: recommendation.name,
+                        youtubeLink: recommendation.youtubeLink,
+                        score: 5,
+                    },
+                ]
+            }
+        )
+
+        const result = await recommendationService.getRandom()
+        expect(result).toStrictEqual({
+            id: 1,
+            name: recommendation.name,
+            youtubeLink: recommendation.youtubeLink,
+            score: 5,
+        })
+    })
+
+    it("should throw error when no recommendations are found", async () => {
+        const result = await recommendationService.getRandom().catch((err) => {
+            expect(err.type).toEqual("not_found")
+        })
+    })
+})

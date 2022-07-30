@@ -1,3 +1,5 @@
+import { faker } from "@faker-js/faker"
+
 import { prisma } from "../../src/database.js"
 import { recommendationService } from "../../src/services/recommendationsService.js"
 import { recommendationRepository } from "../../src/repositories/recommendationRepository.js"
@@ -171,5 +173,45 @@ describe("get", () => {
 
         const result = await recommendationService.get()
         expect(result).toStrictEqual({})
+    })
+})
+
+describe("getTop", () => {
+    it("should answer with top 3 recommendations", async () => {
+        const recommendations = []
+        for (let i = 0; i < 3; i++) {
+            recommendations.push({
+                id: i + 1,
+                name: faker.name.findName(),
+                youtubeLink: faker.internet.url(),
+                score: (i + 1) * 3,
+            })
+        }
+
+        jest.spyOn(
+            recommendationRepository,
+            "getAmountByScore"
+        ).mockImplementationOnce((): any => {
+            return [recommendations[2], recommendations[1], recommendations[0]]
+        })
+
+        const result = await recommendationService.getTop(3)
+        expect(result).toStrictEqual([
+            recommendations[2],
+            recommendations[1],
+            recommendations[0],
+        ])
+    })
+
+    it("should answer with an empty array when there are no recommendations", async () => {
+        jest.spyOn(
+            recommendationRepository,
+            "getAmountByScore"
+        ).mockImplementationOnce((): any => {
+            return []
+        })
+
+        const result = await recommendationService.getTop(5)
+        expect(result).toStrictEqual([])
     })
 })

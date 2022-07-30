@@ -138,3 +138,38 @@ describe("downvote", () => {
         })
     })
 })
+
+describe("get", () => {
+    it("should answer with all existing recommendations", async () => {
+        const recommendation = servicesFactory.recommendationTemplate()
+
+        jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce(
+            (): any => {
+                return {
+                    id: 1,
+                    name: recommendation.name,
+                    youtubeLink: recommendation.youtubeLink,
+                    score: -6,
+                }
+            }
+        )
+        const result = await recommendationService.get()
+        expect(result).toStrictEqual({
+            id: 1,
+            name: recommendation.name,
+            youtubeLink: recommendation.youtubeLink,
+            score: -6,
+        })
+    })
+
+    it("should answer with an empty object if there are no recommendations", async () => {
+        jest.spyOn(recommendationRepository, "findAll").mockImplementationOnce(
+            (): any => {
+                return {}
+            }
+        )
+
+        const result = await recommendationService.get()
+        expect(result).toStrictEqual({})
+    })
+})

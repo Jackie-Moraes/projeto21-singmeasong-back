@@ -6,7 +6,8 @@
     "main": "index.js",
     "scripts": {
         "dev": "nodemon src/server.ts",
-        "test": "cross-env NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.test jest -- -i"
+        "test": "cross-env NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.test jest -- -i --coverage",
+        "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.test jest -- --testPathPattern=tests/unitary -i --coverage"
     },
     "keywords": [],
     "author": "",
